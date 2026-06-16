@@ -17,6 +17,15 @@ DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.co
 DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
 
 
+def get_runtime_config():
+    """Read environment variables at runtime to avoid stale import-time values."""
+    return {
+        "api_key": os.environ.get("DEEPSEEK_API_KEY", DEEPSEEK_API_KEY),
+        "base_url": os.environ.get("DEEPSEEK_BASE_URL", DEEPSEEK_BASE_URL),
+        "model": os.environ.get("DEEPSEEK_MODEL", DEEPSEEK_MODEL),
+    }
+
+
 def load_vector_store():
     embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-zh")
     return Chroma(persist_directory=CHROMA_DIR, embedding_function=embeddings)
@@ -34,7 +43,8 @@ def build_context(chunks):
 
 
 def ask_question(question, context, history=None):
-    client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url=DEEPSEEK_BASE_URL)
+    cfg = get_runtime_config()
+    client = OpenAI(api_key=cfg["api_key"], base_url=cfg["base_url"])
 
     prompt = f"""你是一名专业的电商售后客服。请基于以下参考资料回答用户的问题。
 
@@ -60,7 +70,7 @@ def ask_question(question, context, history=None):
 
     try:
         response = client.chat.completions.create(
-            model=DEEPSEEK_MODEL,
+            model=cfg["model"],
             messages=messages,
             temperature=0.3,
             stream=False,
@@ -76,7 +86,8 @@ def main():
     print("您可以咨询退换货、物流、产品使用等问题，输入 'exit' 退出")
     print("=" * 60)
 
-    if not DEEPSEEK_API_KEY:
+    cfg = get_runtime_config()
+    if not cfg["api_key"]:
         print("请先设置 DEEPSEEK_API_KEY 环境变量")
         print("PowerShell: $env:DEEPSEEK_API_KEY = \"你的API-Key\"")
         return

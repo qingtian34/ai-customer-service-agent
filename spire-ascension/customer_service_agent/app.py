@@ -1,10 +1,11 @@
 # app.py - 电商售后客服网页版（可分享给他人使用）
 
+import os
 import streamlit as st
 from query import (
-    DEEPSEEK_API_KEY,
     ask_question,
     build_context,
+    get_runtime_config,
     load_vector_store,
     search_relevant_chunks,
 )
@@ -17,7 +18,19 @@ st.caption("DeepSeek + 本地知识库 | 退换货 · 物流 · 尺码 · 优惠
 if "cs_messages" not in st.session_state:
     st.session_state.cs_messages = []
 
-if not DEEPSEEK_API_KEY:
+runtime_key = os.environ.get("DEEPSEEK_API_KEY", "").strip()
+if not runtime_key:
+    try:
+        runtime_key = str(st.secrets.get("DEEPSEEK_API_KEY", "")).strip()
+    except Exception:
+        runtime_key = ""
+
+if runtime_key:
+    # Ensure downstream query module reads a guaranteed key.
+    os.environ["DEEPSEEK_API_KEY"] = runtime_key
+
+cfg = get_runtime_config()
+if not cfg["api_key"]:
     st.error("未配置 DEEPSEEK_API_KEY，请在 .env 文件中填写 API Key。")
     st.stop()
 
