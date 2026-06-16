@@ -1,9 +1,10 @@
 # query.py - 电商售后客服问答系统
 
 import os
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from openai import OpenAI
+
+from embeddings_util import get_embeddings
 
 try:
     from dotenv import load_dotenv
@@ -27,7 +28,7 @@ def get_runtime_config():
 
 
 def load_vector_store():
-    embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-zh")
+    embeddings = get_embeddings()
     return Chroma(persist_directory=CHROMA_DIR, embedding_function=embeddings)
 
 

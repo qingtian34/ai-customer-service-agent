@@ -17,6 +17,8 @@ st.caption("DeepSeek + 本地知识库 | 退换货 · 物流 · 尺码 · 优惠
 
 if "cs_messages" not in st.session_state:
     st.session_state.cs_messages = []
+if "vector_store" not in st.session_state:
+    st.session_state.vector_store = None
 
 runtime_key = os.environ.get("DEEPSEEK_API_KEY", "").strip()
 if not runtime_key:
@@ -26,23 +28,24 @@ if not runtime_key:
         runtime_key = ""
 
 if runtime_key:
-    # Ensure downstream query module reads a guaranteed key.
     os.environ["DEEPSEEK_API_KEY"] = runtime_key
 
 cfg = get_runtime_config()
 if not cfg["api_key"]:
-    st.error("未配置 DEEPSEEK_API_KEY，请在 .env 文件中填写 API Key。")
+    st.error("未配置 DEEPSEEK_API_KEY，请在 Render Environment 中添加该变量。")
     st.stop()
 
-@st.cache_resource
+
+@st.cache_resource(show_spinner="正在加载知识库（首次约需 30 秒）...")
 def get_vector_store():
     return load_vector_store()
 
-try:
-    vector_store = get_vector_store()
-except Exception:
-    st.error("向量库加载失败，请先运行：python ingest.py")
-    st.stop()
+
+def ensure_vector_store():
+    if st.session_state.vector_store is None:
+        st.session_state.vector_store = get_vector_store()
+    return st.session_state.vector_store
+
 
 for msg in st.session_state.cs_messages:
     with st.chat_message(msg["role"]):
@@ -70,10 +73,17 @@ if question:
         st.markdown(question)
 
     with st.chat_message("assistant"):
-        with st.spinner("正在查询知识库..."):
-            chunks = search_relevant_chunks(vector_store, question)
-            context = build_context(chunks)
-            answer = ask_question(question, context)
+        try:
+            with st.spinner("正在加载知识库并查询..."):
+                vector_store = ensure_vector_store()
+                chunks = search_relevant_chunks(vector_store, question)
+                context = build_context(chunks)
+                answer = ask_question(question, context)
+        except Exception as e:
+            answer = (
+                f"知识库加载失败：{e}\n\n"
+                "请确认 Render Build Command 包含 `python ingest.py`，然后重新部署。"
+            )
         st.markdown(answer)
 
     st.session_state.cs_messages.append({"role": "assistant", "content": answer})
@@ -83,8 +93,8 @@ with st.sidebar:
     st.markdown(
         """
         - 回答基于本地 FAQ 知识库
-        - 同一 WiFi 下他人可访问你的电脑 IP
-        - 公网分享需部署到云服务器
+        - 首次提问会加载向量库，请稍等
+        - 公网链接由 Render 托管
         """
     )
     if st.button("清空对话"):

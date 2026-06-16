@@ -3,8 +3,9 @@
 import os
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
+
+from embeddings_util import get_embeddings
 
 DOCS_DIR = "docs"
 CHROMA_DIR = "chroma_db"
@@ -31,15 +32,14 @@ def build_vector_store():
     chunks = text_splitter.split_documents(documents)
     print(f"[OK] 已切分为 {len(chunks)} 个文档块")
 
-    print("正在加载中文向量模型（首次运行需要下载，之后会复用缓存）...")
-    embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-zh")
+    print("正在加载轻量向量模型（fastembed）...")
+    embeddings = get_embeddings()
 
     vector_store = Chroma.from_documents(
         documents=chunks,
         embedding=embeddings,
         persist_directory=CHROMA_DIR,
     )
-    vector_store.persist()
     print(f"[OK] 向量库已保存至 {CHROMA_DIR}")
     return vector_store
 
