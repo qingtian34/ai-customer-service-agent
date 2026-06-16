@@ -1,0 +1,44 @@
+什么是Java内存模型（JMM）？
+Java内存模型规定了所有变量都存储在主内存中，每个线程有自己的工作内存。线程对变量的所有操作都必须在工作内存中进行，不能直接读写主内存中的变量。JMM定义了线程、主内存、工作内存之间的交互规则，以及happens-before等可见性保证。
+
+HashMap和ConcurrentHashMap的区别？
+HashMap非线程安全，多线程并发修改可能导致数据丢失或死循环（JDK7）。ConcurrentHashMap通过分段锁（JDK7）或CAS+synchronized（JDK8+）实现线程安全，读操作大多无锁，并发性能更好。
+
+Java中==和equals的区别？
+==比较基本类型时比较值，比较引用类型时比较内存地址。equals默认行为同==，但String、Integer等类重写后比较内容。重写equals必须同时重写hashCode，以保证在HashMap等集合中行为正确。
+
+什么是垃圾回收？常见的GC算法有哪些？
+垃圾回收自动回收不再使用的对象所占内存。常见算法：标记-清除、标记-整理、复制算法。分代收集：新生代用复制算法（Eden+Survivor），老年代用标记-整理。收集器如G1、ZGC适用于不同延迟和吞吐需求。
+
+synchronized和volatile的区别？
+synchronized保证互斥和可见性，可修饰方法或代码块，涉及锁升级。volatile仅保证可见性和禁止指令重排，不保证原子性，适用于状态标志位。复合操作如i++仍需synchronized或原子类。
+
+什么是线程池？核心参数有哪些？
+线程池复用线程降低创建销毁开销。ThreadPoolExecutor核心参数：corePoolSize、maximumPoolSize、keepAliveTime、workQueue、threadFactory、handler。合理配置可避免OOM和线程过多导致的上下文切换开销。
+
+Spring Bean的生命周期？
+大致流程：实例化→属性注入→Aware接口回调→BeanPostProcessor前置→初始化方法→BeanPostProcessor后置→使用→销毁。常用扩展点包括@PostConstruct、InitializingBean、@PreDestroy。
+
+什么是事务？ACID指什么？
+事务是一组操作的逻辑单元。ACID：原子性（全部成功或全部失败）、一致性（数据满足约束）、隔离性（并发互不干扰）、持久性（提交后永久保存）。Spring通过@Transactional管理事务，底层依赖数据库事务。
+
+MyBatis和Hibernate的区别？
+MyBatis是半自动ORM，SQL可手写优化，学习成本低，适合复杂查询。Hibernate全自动ORM，开发效率高但SQL不可控，适合标准CRUD。MyBatis+#注解或XML在国内项目更常见。
+
+什么是反射？有什么应用场景？
+反射在运行时动态获取类信息并操作对象。应用：框架依赖注入（Spring）、动态代理、序列化、注解处理。缺点是破坏封装、性能较低，框架中常结合缓存优化。
+
+ArrayList和LinkedList的区别？
+ArrayList基于动态数组，随机访问O(1)，尾部插入均摊O(1)，中间插入删除O(n)。LinkedList基于双向链表，随机访问O(n)，头尾插入删除O(1)。根据读写比例选择，多数场景ArrayList更优。
+
+什么是双亲委派模型？
+类加载时先委派父加载器加载，父无法加载时子加载器才尝试。保证核心类库安全（如java.lang.String不会被自定义类替换）。打破双亲委派的场景包括SPI（如JDBC）和OSGi。
+
+Integer缓存机制是什么？
+Integer对-128到127之间的值做了缓存，自动装箱时直接返回缓存对象。因此Integer a=127与Integer b=127时a==b为true，而200==200可能为false。比较数值应使用equals。
+
+什么是CAS？有什么问题？
+CAS（Compare-And-Swap）无锁更新，包含内存地址、期望值、新值。ABA问题可用版本号解决（AtomicStampedReference）。高并发下CAS自旋消耗CPU，需结合锁或分段策略。
+
+@RestController和@Controller的区别？
+@Controller返回视图名由视图解析器渲染。@RestController=@Controller+@ResponseBody，返回值直接序列化为JSON/XML写入响应体，适用于REST API。Spring MVC项目API层常用@RestController。

@@ -1,0 +1,440 @@
+/* —— 美术与动画扩展 —— */
+
+#vfx-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+  overflow: hidden;
+}
+
+/* 卡牌插图 */
+.card-art {
+  width: 100%;
+  height: 88px;
+  border-radius: 6px 6px 0 0;
+  overflow: hidden;
+  margin: -0.5rem -0.5rem 0.35rem;
+  position: relative;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.card-art-hand { height: 92px; }
+.card-art-large { height: 110px; border-radius: 8px; margin: 0 0 0.5rem; }
+
+.art-svg { width: 100%; height: 100%; display: block; }
+
+/* Kenney 矢量主图标 — 由 game-icons 模块渲染，见 game-icons-art.css */
+.card-motif-wrap .gi-icon { display: block; }
+
+.card-art-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 42%, transparent 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.card-art-type-attack { box-shadow: inset 0 -20px 30px rgba(224,96,80,0.12); }
+.card-art-type-skill { box-shadow: inset 0 -20px 30px rgba(80,144,224,0.12); }
+.card-art-type-power { box-shadow: inset 0 -20px 30px rgba(144,96,224,0.12); }
+
+.hand-card {
+  width: 148px;
+  min-height: 228px;
+  padding: 0.5rem;
+  overflow: hidden;
+}
+
+.hand-card .card-name { margin-top: 0.25rem; }
+.hand-card .card-kw { min-height: 1rem; }
+
+.card-rarity {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  opacity: 0.55;
+  letter-spacing: 0.05em;
+}
+
+.rarity-rare, .rarity-uncommon { opacity: 0.85; }
+.rarity-rare { color: var(--accent-gold); text-shadow: 0 0 6px var(--glow); }
+
+/* 英雄立绘 */
+.hero-art {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,255,255,0.12);
+}
+
+.hero-art-portrait { width: 148px; height: 196px; min-height: 196px; }
+.hero-art-large { width: 200px; height: 266px; }
+
+.anim-idle { animation: heroIdle 4s ease-in-out infinite; }
+@keyframes heroIdle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.class-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.class-card .hero-art-portrait { margin-bottom: 0.75rem; }
+
+.class-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, var(--class-color, #fff) 0%, transparent 65%);
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+/* 敌人立绘 */
+.enemy-art {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 0.5rem;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.enemy-frame-normal { box-shadow: 0 0 16px rgba(80,80,120,0.3); border: 2px solid #3a4060; }
+.enemy-frame-elite { box-shadow: 0 0 24px rgba(212,168,75,0.45); border: 2px solid var(--accent-gold); }
+.enemy-frame-boss { box-shadow: 0 0 32px rgba(196,75,75,0.55); border: 3px solid var(--accent-red); animation: bossGlow 2s ease-in-out infinite; }
+
+@keyframes bossGlow {
+  0%, 100% { box-shadow: 0 0 24px rgba(196,75,75,0.4); }
+  50% { box-shadow: 0 0 40px rgba(255,80,80,0.7); }
+}
+
+.anim-enemy-idle { animation: enemyIdle 3s ease-in-out infinite; }
+@keyframes enemyIdle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+.enemy-panel.anim-hit { animation: enemyHit 0.45s ease; }
+@keyframes enemyHit {
+  0%, 100% { transform: translateX(0); filter: brightness(1); }
+  20% { transform: translateX(-6px); filter: brightness(1.8) saturate(1.5); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); filter: brightness(1.4); }
+}
+
+.enemy-panel.targeted { transform: scale(1.06); }
+
+.enemy-panel.targeted .enemy-art { animation: targetPulse 1.2s ease-in-out infinite; }
+@keyframes targetPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(196,75,75,0.3); }
+  50% { box-shadow: 0 0 28px rgba(196,75,75,0.7); }
+}
+
+/* 玩家区域 */
+.combat-top { position: relative; }
+
+.combat-bg-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.combat-bg-fx::before,
+.combat-bg-fx::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  animation: bgOrb 8s ease-in-out infinite;
+}
+
+.combat-bg-fx::before { width: 300px; height: 300px; top: 10%; left: 15%; background: #6040a0; }
+.combat-bg-fx::after { width: 250px; height: 250px; bottom: 20%; right: 10%; background: #304080; animation-delay: -4s; }
+
+@keyframes bgOrb {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(20px, -15px); }
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.player-portrait { flex-shrink: 0; }
+
+.player-portrait .hero-art-portrait {
+  width: 100px;
+  height: 133px;
+  border-color: var(--class-color, rgba(255,255,255,0.2));
+}
+
+.player-area.anim-hit { animation: playerHit 0.45s ease; }
+@keyframes playerHit {
+  0%, 100% { filter: brightness(1); }
+  30% { filter: brightness(1.6) hue-rotate(-20deg); }
+}
+
+.hp-bar-visual {
+  height: 8px;
+  background: #2a1010;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 0.35rem;
+  max-width: 200px;
+}
+
+.hp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b2020, #e06050);
+  transition: width 0.4s ease;
+  box-shadow: 0 0 8px rgba(224,96,80,0.5);
+}
+
+.block-ring {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(74,127,212,0.2);
+  border: 1px solid var(--accent-blue);
+  border-radius: 20px;
+}
+
+/* 遗物插图 */
+.relic-art {
+  width: 36px;
+  height: 36px;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: help;
+  transition: transform 0.15s;
+}
+
+.relic-art:hover { transform: scale(1.15); }
+
+.boss-relic-card .relic-art {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 0.75rem;
+}
+
+/* 地图节点光效 */
+.map-node .map-node-art {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.map-node-glow {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--node-color, #8090a0) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.map-node.available .map-node-glow { opacity: 0.35; animation: nodeGlow 2s ease-in-out infinite; }
+
+@keyframes nodeGlow {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.15); opacity: 0.5; }
+}
+
+.map-node .node-icon { position: relative; z-index: 1; }
+
+.menu-heroes {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding: 0 5% 10%;
+  pointer-events: none;
+  opacity: 0.12;
+}
+
+.menu-content { position: relative; z-index: 2; }
+
+.title {
+  background: linear-gradient(180deg, #f0e8d0, #d4a84b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 4px 12px rgba(212,168,75,0.3));
+}
+
+/* VFX */
+.vfx-float {
+  position: fixed;
+  font-weight: 800;
+  font-size: 1.4rem;
+  transform: translate(-50%, -50%) scale(0.6);
+  opacity: 0;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  z-index: 9100;
+}
+
+.vfx-float.active { animation: vfxFloatUp 1s ease-out forwards; }
+.vfx-damage { color: #ff6050; }
+.vfx-block { color: #70b0ff; }
+.vfx-heal { color: #60e080; }
+.vfx-poison { color: #80ff60; }
+.vfx-buff { color: #ffd060; }
+
+@keyframes vfxFloatUp {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  15% { opacity: 1; transform: translate(-50%, -70%) scale(1.1); }
+  100% { opacity: 0; transform: translate(-50%, -140%) scale(0.9); }
+}
+
+.vfx-slash {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%) rotate(-35deg) scale(0);
+  opacity: 0;
+  background: linear-gradient(135deg, transparent 40%, rgba(255,100,80,0.9) 50%, transparent 60%);
+  z-index: 9050;
+}
+
+.vfx-slash.active { animation: vfxSlash 0.45s ease-out forwards; }
+
+@keyframes vfxSlash {
+  0% { opacity: 0; transform: translate(-50%, -50%) rotate(-35deg) scale(0.3); }
+  30% { opacity: 1; transform: translate(-50%, -50%) rotate(-35deg) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(-35deg) scale(1.5); }
+}
+
+.vfx-shield {
+  position: fixed;
+  width: 100px;
+  height: 100px;
+  transform: translate(-50%, -50%) scale(0.5);
+  border: 3px solid rgba(112,176,255,0.8);
+  border-radius: 50%;
+  opacity: 0;
+  z-index: 9050;
+}
+
+.vfx-shield.active { animation: vfxShield 0.55s ease-out forwards; }
+
+@keyframes vfxShield {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  40% { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
+}
+
+.vfx-heal {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(96,224,128,0.6), transparent 70%);
+  opacity: 0;
+  z-index: 9050;
+}
+
+.vfx-heal.active { animation: vfxHeal 0.65s ease-out forwards; }
+
+@keyframes vfxHeal {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.6); }
+}
+
+.vfx-screen-flash {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,60,60,0.15);
+  opacity: 0;
+  z-index: 8999;
+}
+
+.vfx-screen-flash.active { animation: vfxFlash 0.35s ease-out forwards; }
+
+@keyframes vfxFlash {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+#app { animation: screenIn 0.35s ease-out; }
+
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hand-card.card-played {
+  animation: cardPlayFly 0.4s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes cardPlayFly {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  40% { transform: translateY(-60px) scale(1.05); opacity: 0.9; }
+  100% { transform: translateY(-120px) scale(0.6); opacity: 0; }
+}
+
+.reward-cards .hand-card { width: 160px; min-height: 240px; }
+
+.ascension-panel { text-align: center; }
+.ascension-hero { display: flex; justify-content: center; margin-bottom: 1rem; }
+.ascension-hero .hero-art-portrait { width: 120px; height: 160px; }
+
+.shop-relic { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; }
+.shop-item { position: relative; cursor: pointer; }
+.shop-item:hover .hand-card { transform: translateY(-8px); }
+
+.menu-heroes .hero-art-large { width: 160px; height: 213px; opacity: 1; }
+
+.player-portrait .hero-art { border-color: var(--class-color); }
+
+.enemy-panel {
+  min-width: 180px;
+  padding: 1rem 1rem 0.75rem;
+  background: rgba(20, 16, 28, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+.player-area {
+  background: rgba(16, 20, 32, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.combat-scene { position: relative; }
+
+.victory-hero, .defeat-hero { display: flex; justify-content: center; margin-bottom: 1rem; }
+.victory-hero .hero-art-portrait { width: 120px; height: 160px; border-color: var(--accent-gold); }
+
+.codex-card { overflow: hidden; position: relative; }
+.codex-card .card-art-large { margin: -0.5rem -0.5rem 0.5rem; }
+.codex-card .card-cost { position: absolute; top: 4px; left: 4px; }
+
+.card-cost {
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}

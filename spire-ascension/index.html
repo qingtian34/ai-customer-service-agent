@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>星渊之塔 · Star Abyss Tower</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/art.css" />
+  <link rel="stylesheet" href="css/combat-sts.css" />
+  <link rel="stylesheet" href="css/assets-kenney.css" />
+  <link rel="stylesheet" href="css/game-icons-art.css" />
+  <link rel="stylesheet" href="css/polish.css" />
+</head>
+<body>
+  <canvas id="bg-canvas" aria-hidden="true" tabindex="-1" style="pointer-events:none"></canvas>
+  <div id="app">
+    <div class="boot-screen">
+      <div class="boot-logo">星渊之塔</div>
+      <div class="boot-bar"><div class="boot-progress-fill"></div></div>
+      <p class="boot-label">正在加载…</p>
+    </div>
+  </div>
+  <div id="modal" class="modal hidden"></div>
+  <script type="module" src="js/boot.js"></script>
+  <script>
+    window.addEventListener('error', (e) => {
+      const app = document.getElementById('app');
+      if (app) app.innerHTML = '<div class="boot-error"><h2>加载失败</h2><pre>' + e.message + '</pre><p>请刷新页面或检查控制台 (F12)</p></div>';
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      const app = document.getElementById('app');
+      if (app) app.innerHTML = '<div class="boot-error"><h2>模块加载失败</h2><pre>' + (e.reason?.message || e.reason) + '</pre></div>';
+    });
+  </script>
+</body>
+</html>

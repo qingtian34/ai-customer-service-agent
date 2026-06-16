@@ -1,0 +1,164 @@
+/* 全局打磨：启动、过渡、设置、提示 */
+
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none !important;
+  touch-action: none;
+  user-select: none;
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+
+#app {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  width: 100vw;
+  height: 100vh;
+}
+
+#vfx-layer { position: fixed; z-index: 9000; }
+#modal { z-index: 8000; }
+#tooltip { z-index: 9500; }
+
+/* 启动屏 */
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #0a0c12;
+  transition: opacity 0.5s ease;
+}
+
+.boot-screen.boot-done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.boot-logo {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(180deg, #f0e8d0, #d4a84b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1.5rem;
+}
+
+.boot-bar {
+  width: 280px;
+  height: 6px;
+  background: #1a2030;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid #2a3048;
+}
+
+.boot-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #8a6020, #d4a84b);
+  transition: width 0.25s ease;
+  box-shadow: 0 0 12px rgba(212, 168, 75, 0.5);
+}
+
+.boot-label {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* 屏幕过渡 */
+#app.screen-enter {
+  animation: screenEnter 0.35s ease-out;
+}
+
+@keyframes screenEnter {
+  from { opacity: 0; transform: translateY(12px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 悬浮提示 */
+#tooltip {
+  position: fixed;
+  max-width: 280px;
+  background: rgba(12, 14, 22, 0.96);
+  border: 2px solid var(--accent-gold);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  transition: opacity 0.12s;
+}
+
+#tooltip.hidden { opacity: 0; visibility: hidden; }
+
+.tooltip-title { font-weight: 700; color: var(--accent-gold); font-size: 1rem; }
+.tooltip-meta { font-size: 0.75rem; color: var(--text-dim); margin: 0.25rem 0; }
+.tooltip-desc { font-size: 0.85rem; line-height: 1.45; color: var(--text); }
+.tooltip-kw { font-size: 0.7rem; color: var(--accent-green); margin-top: 0.35rem; }
+
+/* 暂停菜单设置 */
+.audio-settings {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  text-align: left;
+}
+
+.audio-settings label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.audio-settings input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent-gold);
+}
+
+/* 意图悬停 */
+.intent-bubble { cursor: help; }
+
+/* 地图节点动效 */
+.map-node.available {
+  transition: transform 0.2s, filter 0.2s;
+}
+
+.map-node.available:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  filter: brightness(1.2);
+  z-index: 10;
+}
+
+/* 奖励面板入场 */
+.panel.reward-panel,
+.panel.boss-relic-panel {
+  animation: panelPop 0.4s ease-out;
+}
+
+@keyframes panelPop {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* 成就 toast */
+.achievement-toast {
+  border-color: var(--accent-gold);
+  background: linear-gradient(135deg, rgba(40, 32, 16, 0.95), rgba(20, 18, 12, 0.95));
+}
+
+/* 音量按钮 */
+.btn-audio-test {
+  font-size: 0.75rem;
+  margin-top: 0.35rem;
+}
