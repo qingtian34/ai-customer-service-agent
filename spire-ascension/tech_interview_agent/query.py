@@ -1,9 +1,10 @@
 # query.py - 技术面试问答主程序
 
 import os
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from openai import OpenAI
+
+from embeddings_util import get_embeddings
 
 try:
     from dotenv import load_dotenv
@@ -17,9 +18,17 @@ DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.co
 DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
 
 
+def get_runtime_config():
+    return {
+        "api_key": os.environ.get("DEEPSEEK_API_KEY", DEEPSEEK_API_KEY),
+        "base_url": os.environ.get("DEEPSEEK_BASE_URL", DEEPSEEK_BASE_URL),
+        "model": os.environ.get("DEEPSEEK_MODEL", DEEPSEEK_MODEL),
+    }
+
+
 def load_vector_store():
     print("正在加载向量库...")
-    embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-zh")
+    embeddings = get_embeddings()
     vector_store = Chroma(
         persist_directory=CHROMA_DIR,
         embedding_function=embeddings,
@@ -40,7 +49,8 @@ def build_context(chunks):
 
 
 def ask_question(question, context):
-    client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url=DEEPSEEK_BASE_URL)
+    cfg = get_runtime_config()
+    client = OpenAI(api_key=cfg["api_key"], base_url=cfg["base_url"])
 
     prompt = f"""你是一名资深的技术面试官，请基于以下参考资料回答用户的问题。
 
@@ -60,7 +70,7 @@ def ask_question(question, context):
 
     try:
         response = client.chat.completions.create(
-            model=DEEPSEEK_MODEL,
+            model=cfg["model"],
             messages=[
                 {
                     "role": "system",
@@ -82,7 +92,8 @@ def main():
     print("提示：输入 'exit' 退出程序")
     print("=" * 60)
 
-    if not DEEPSEEK_API_KEY:
+    cfg = get_runtime_config()
+    if not cfg["api_key"]:
         print("[!] 错误：请先设置 DEEPSEEK_API_KEY 环境变量")
         print("PowerShell: $env:DEEPSEEK_API_KEY = \"你的key\"")
         return
